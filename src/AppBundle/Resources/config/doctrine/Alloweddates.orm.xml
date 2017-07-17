@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Alloweddates" table="allowedDates">
+    <indexes>
+      <index name="fk_allowedDates_companyID_idx" columns="companyID"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="timefrom" type="time" column="timeFrom" nullable="true"/>
+    <field name="timeto" type="time" column="timeTo" nullable="true"/>
+    <field name="dayofweek" type="string" column="dayOfWeek" length="5" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <many-to-one field="companyid" target-entity="Company" fetch="LAZY">
+      <join-columns>
+        <join-column name="companyID" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>
