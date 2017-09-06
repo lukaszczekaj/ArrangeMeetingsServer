@@ -55,6 +55,13 @@ class Company
     private $addresspostalcode;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="imgurl", type="text", length=65535, nullable=true)
+     */
+    private $imgurl;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -207,6 +214,30 @@ class Company
     public function getAddresspostalcode()
     {
         return $this->addresspostalcode;
+    }
+
+    /**
+     * Set imgurl
+     *
+     * @param string $imgurl
+     *
+     * @return Company
+     */
+    public function setImgurl($imgurl)
+    {
+        $this->imgurl = $imgurl;
+
+        return $this;
+    }
+
+    /**
+     * Get imgurl
+     *
+     * @return string
+     */
+    public function getImgurl()
+    {
+        return $this->imgurl;
     }
 
     /**

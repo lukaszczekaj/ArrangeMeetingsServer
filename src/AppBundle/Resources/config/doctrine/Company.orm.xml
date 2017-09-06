@@ -34,5 +34,10 @@
         <option name="fixed"/>
       </options>
     </field>
+    <field name="imgurl" type="text" column="imgurl" length="65535" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
   </entity>
 </doctrine-mapping>

@@ -15,14 +15,14 @@ class Excludeddates
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="dateFrom", type="datetime", nullable=true)
+     * @ORM\Column(name="dateFrom", type="time", nullable=true)
      */
     private $datefrom;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="dateTo", type="datetime", nullable=true)
+     * @ORM\Column(name="dateTo", type="time", nullable=true)
      */
     private $dateto;
 

@@ -7,8 +7,8 @@
     <id name="id" type="integer" column="id">
       <generator strategy="IDENTITY"/>
     </id>
-    <field name="datefrom" type="datetime" column="dateFrom" nullable="true"/>
-    <field name="dateto" type="datetime" column="dateTo" nullable="true"/>
+    <field name="datefrom" type="time" column="dateFrom" nullable="true"/>
+    <field name="dateto" type="time" column="dateTo" nullable="true"/>
     <many-to-one field="companyid" target-entity="Company" fetch="LAZY">
       <join-columns>
         <join-column name="companyID" referenced-column-name="id"/>
