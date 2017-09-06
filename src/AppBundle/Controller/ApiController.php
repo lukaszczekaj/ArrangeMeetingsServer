@@ -68,8 +68,8 @@ class ApiController extends FOSRestController {
         }
 
 
-        $dateFrom = sprintf('%s-%s-%s %s:%s:00', $data['year'], str_pad(intval($data['month'])+1, 2, 0, STR_PAD_LEFT), str_pad($data['day'], 2, 0, STR_PAD_LEFT), str_pad($data['timeFromHour'], 2, 0, STR_PAD_LEFT),str_pad($data['timeFromMinute'], 2, 0, STR_PAD_LEFT));
-        $dateTo = sprintf('%s-%s-%s %s:%s:00', $data['year'], str_pad(intval($data['month'])+1, 2, 0, STR_PAD_LEFT), str_pad($data['day'], 2, 0, STR_PAD_LEFT), str_pad($data['timeToHour'], 2, 0, STR_PAD_LEFT),str_pad($data['timeToMinute'], 2, 0, STR_PAD_LEFT));
+        $dateFrom = sprintf('%s-%s-%s %s:%s:00', $data['year'], str_pad(intval($data['month']) + 1, 2, 0, STR_PAD_LEFT), str_pad($data['day'], 2, 0, STR_PAD_LEFT), str_pad($data['timeFromHour'], 2, 0, STR_PAD_LEFT), str_pad($data['timeFromMinute'], 2, 0, STR_PAD_LEFT));
+        $dateTo = sprintf('%s-%s-%s %s:%s:00', $data['year'], str_pad(intval($data['month']) + 1, 2, 0, STR_PAD_LEFT), str_pad($data['day'], 2, 0, STR_PAD_LEFT), str_pad($data['timeToHour'], 2, 0, STR_PAD_LEFT), str_pad($data['timeToMinute'], 2, 0, STR_PAD_LEFT));
 
         $metting = new Metting();
         $metting->setFirstname($data['firstName']);
@@ -79,7 +79,7 @@ class ApiController extends FOSRestController {
         $metting->setDateadd(new \DateTime());
         $metting->setDatefrom(new \DateTime($dateFrom));
         $metting->setDateto(new \DateTime($dateTo));
-        $company =  $this->getDoctrine()->getRepository('AppBundle:Company')->findOneBy(array('id' => $data['companyID']));
+        $company = $this->getDoctrine()->getRepository('AppBundle:Company')->findOneBy(array('id' => $data['companyID']));
         if (!$company) {
             return json_encode(array('code' => 300, 'message' => 'Błąd pobrania firmy'));
         }
@@ -87,41 +87,56 @@ class ApiController extends FOSRestController {
 
         $em = $this->getDoctrine()->getEntityManager();
         $em->persist($metting);
-       //     file_put_contents('/tmp/data.txt', var_export($metting, true) . PHP_EOL, FILE_APPEND);
+        //     file_put_contents('/tmp/data.txt', var_export($metting, true) . PHP_EOL, FILE_APPEND);
 
         try {
             $em->flush();
         } catch (Exception $exc) {
             return json_encode(array('code' => 300, 'message' => $exc->getMessage()));
-        } 
-        
-        $this->sendMailMessage();
+        }
 
-       // file_put_contents('/tmp/data.txt', var_export($metting, true) . PHP_EOL, FILE_APPEND);
+        // file_put_contents('/tmp/data.txt', var_export($metting, true) . PHP_EOL, FILE_APPEND);
 
 
 
-        return json_encode(array('code' => 400, 'message' => 'Zapisano'));
+        return json_encode(array('code' => 200, 'message' => 'Zapisane'));
     }
-    
+
+    /**
+     * @Rest\Get("/test")
+     */
+    public function getTest(Request $request, \Swift_Mailer $mailer) {
+
+
+        $a = $this->sendMailMessage();
+
+
+        return json_encode(array('code' => 400, 'message' => $a));
+    }
+
     private function sendMailMessage() {
-        $message = \Swift_Message::newInstance()
-        ->setSubject('Hello Email')
-        ->setFrom('powiadomienia@lukaszczekaj.pl')
-        ->setTo('lukaszcz16@gmail.com')
-        ->setBody(
-            "aaaa"
-        )
-        /*
-         $this->renderView(
-                // app/Resources/views/Emails/registration.html.twig
-                'Emails/registration.html.twig',
-                array('name' => $name)
-            ),
-            'text/html'
-        */
-    ;
-    $this->get('mailer')->send($message);
+                $message = \Swift_Message::newInstance()
+                ->setSubject('Nowe spotkanie2')
+                ->setFrom('powiadomienia@lukaszczekaj.pl')
+                ->setTo('lukaszcz16@gmail.com')
+                ->setCharset('UTF-8')
+                ->setContentType('text/html')
+                ->setBody(
+                $this->renderView(
+                        // app/Resources/views/Emails/registration.html.twig
+                        'mail.html.twig', array('name' => 'aa')
+                ), 'text/html'
+        );
+
+
+        try {
+            $a =  $this->get('mailer')->send($message);
+        } catch (Exception $exc) {
+            $a = $exc->getMessage();
+        }
+
+    return $a;
+
     }
 
 }
