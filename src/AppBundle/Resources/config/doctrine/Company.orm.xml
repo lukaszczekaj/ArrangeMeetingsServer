@@ -39,5 +39,10 @@
         <option name="fixed"/>
       </options>
     </field>
+    <field name="authtoken" type="string" column="authToken" length="64" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
   </entity>
 </doctrine-mapping>

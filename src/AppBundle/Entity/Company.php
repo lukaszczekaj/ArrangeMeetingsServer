@@ -62,6 +62,13 @@ class Company
     private $imgurl;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="authToken", type="string", length=64, nullable=true)
+     */
+    private $authtoken;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -238,6 +245,30 @@ class Company
     public function getImgurl()
     {
         return $this->imgurl;
+    }
+
+    /**
+     * Set authtoken
+     *
+     * @param string $authtoken
+     *
+     * @return Company
+     */
+    public function setAuthtoken($authtoken)
+    {
+        $this->authtoken = $authtoken;
+
+        return $this;
+    }
+
+    /**
+     * Get authtoken
+     *
+     * @return string
+     */
+    public function getAuthtoken()
+    {
+        return $this->authtoken;
     }
 
     /**

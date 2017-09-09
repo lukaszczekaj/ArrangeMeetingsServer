@@ -13,13 +13,15 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\Metting;
 
 /**
- * Description of ApiController
+ * Api dostępu do aplikacji zarządzania spotkaniami
  *
- * @author Łukasz Czekaj <admin@ecrosio.com>
+ * @author Łukasz Czekaj
  */
 class ApiController extends FOSRestController {
 
     /**
+     * Pobranie listy dostepnych firm
+     * 
      * @Rest\Get("/company-list")
      */
     public function getCompanyListAction() {
@@ -29,6 +31,8 @@ class ApiController extends FOSRestController {
     }
 
     /**
+     * Pobranie danych na temat pojedynczej firmy
+     * 
      * @Rest\Get("/receiving-customers-date/{id}")
      */
     public function getAviableDatesByCompanyIdAction($id, Request $request) {
@@ -43,6 +47,8 @@ class ApiController extends FOSRestController {
     }
 
     /**
+     * Zapis spotkania
+     * 
      * @Rest\Post("/save-metting")
      */
     public function postSaveMeetingAction(Request $request) {
@@ -103,17 +109,9 @@ class ApiController extends FOSRestController {
     }
 
     /**
-     * @Rest\Get("/test")
+     * Obsługuje wysyłkę maili
+     * @return boolean czy się udało wysłać
      */
-    public function getTest(Request $request, \Swift_Mailer $mailer) {
-
-
-        $a = $this->sendMailMessage();
-
-
-        return json_encode(array('code' => 400, 'message' => $a));
-    }
-
     private function sendMailMessage() {
                 $message = \Swift_Message::newInstance()
                 ->setSubject('Nowe spotkanie2')
@@ -137,6 +135,70 @@ class ApiController extends FOSRestController {
 
     return $a;
 
+    }
+    
+    /**
+     * Logowanie firmy do autoryzowanej części aplikacji
+     * 
+     * @Rest\Post("/login/")
+     */
+    public function loginCompanyAction(Request $request) {
+        $mail = $request->get('mail');
+        $pass = $request->get('password');
+        if (empty($mail) || empty($pass)) {
+            return new Response("API: Brak kompletnych danych ", Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $em = $this->getDoctrine()->getEntityManager();
+        $company = $em->getRepository('AppBundle:Company')->findOneBy(array('mail' => $mail));
+        if (!$company) {
+            return json_encode(array('code' => 403, 'message' => 'Niepoprawne dane logowania'));
+        }
+        if ($company->getPass() !== hash('sha256', $pass)) {
+            return json_encode(array('code' => 403, 'message' => 'Niepoprawne dane logowania'));
+        }
+        $company->setAuthtoken(md5(uniqid()));
+        $em->flush();
+
+        return json_encode(array('code' => 403, 'authToken' => $company->getAuthtoken(), 'message' => 'Zalogowano'));
+    }
+    
+    /**
+     * Aktualizacja anych o firmie
+     * 
+     * @Rest\Post("/update-profile/")
+     */
+    public function updateCompanyProfileAction(Request $request) {
+        $token = $request->get('authToken');
+        if (empty($token)) {
+            return new Response("API: Brak kompletnych danych ", Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $em = $this->getDoctrine()->getEntityManager();
+        $company = $em->getRepository('AppBundle:Company')->findOneBy(array('authtoken' => $token));
+        if (!$company) {
+            return new Response("API: Niepoprawna identyfikacja", Response::HTTP_FORBIDDEN);
+        }
+        $data = $request->request->all();
+        if (isset($data['name']) && !empty($data['name'])) {
+            $company->setName($data['name']);
+        }
+        if (isset($data['addressStreet']) && !empty($data['addressStreet'])) {
+            $company->setAddressstreet($data['addressStreet']);
+        }
+        if (isset($data['addressPost']) && !empty($data['addressPost'])) {
+            $company->setAddresspost($data['addressPost']);
+        }
+        $em->flush();
+        return new Response('API: Zapisano zmiany', Response::HTTP_OK);
+    }
+
+    /**
+     * Pobranie firmy na temat tokenu autoryzującego
+     * @param string $token token autoryzujący
+     * @return Enitity Company encja firmy
+     */
+    private function getCompanyByAuthToken($token) {
+        $em = $this->getDoctrine()->getEntityManager();
+        return $em->getRepository('AppBundle:User')->findOneBy(array('authtoken' => $token));
     }
 
 }
